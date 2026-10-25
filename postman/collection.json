@@ -1,0 +1,229 @@
+{
+  "info": {
+    "name": "Student Management System",
+    "description": "Auth, student, course and enrollment APIs through the gateway.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://127.0.0.1:8000" },
+    { "key": "token", "value": "" },
+    { "key": "student_id", "value": "1" },
+    { "key": "course_id", "value": "1" },
+    { "key": "email", "value": "student.admin@example.com" },
+    { "key": "password", "value": "CampusDesk-ChangeMe-123" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Campus Admin\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": "{{base_url}}/auth/register"
+          }
+        },
+        {
+          "name": "Login",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Login succeeds', function () { pm.response.to.have.status(200); });",
+                "const data = pm.response.json();",
+                "if (data.access_token) pm.collectionVariables.set('token', data.access_token);"
+              ],
+              "type": "text/javascript"
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": "{{base_url}}/auth/login"
+          }
+        },
+        {
+          "name": "Current user",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/auth/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Students",
+      "item": [
+        {
+          "name": "List students",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/students"
+          }
+        },
+        {
+          "name": "Create student",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Student created', function () { pm.response.to.have.status(201); });",
+                "const data = pm.response.json();",
+                "if (data.id) pm.collectionVariables.set('student_id', data.id);"
+              ],
+              "type": "text/javascript"
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Taylor Morgan\",\n  \"email\": \"taylor.morgan@example.com\",\n  \"phone\": \"555-0101\",\n  \"department\": \"Science\",\n  \"course_id\": null\n}"
+            },
+            "url": "{{base_url}}/students"
+          }
+        },
+        {
+          "name": "Get student",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/students/{{student_id}}"
+          }
+        },
+        {
+          "name": "Update student",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Taylor Morgan\",\n  \"email\": \"taylor.morgan@example.com\",\n  \"phone\": \"555-0102\",\n  \"department\": \"Science\",\n  \"course_id\": null\n}"
+            },
+            "url": "{{base_url}}/students/{{student_id}}"
+          }
+        },
+        {
+          "name": "Delete student",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/students/{{student_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Courses and enrollment",
+      "item": [
+        {
+          "name": "List courses",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/courses"
+          }
+        },
+        {
+          "name": "Create course",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test('Course created', function () { pm.response.to.have.status(201); });",
+                "const data = pm.response.json();",
+                "if (data.id) pm.collectionVariables.set('course_id', data.id);"
+              ],
+              "type": "text/javascript"
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Applied Physics\",\n  \"code\": \"PHY-201\",\n  \"description\": \"Foundations of physics\",\n  \"department\": \"Science\"\n}"
+            },
+            "url": "{{base_url}}/courses"
+          }
+        },
+        {
+          "name": "Get course",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/courses/{{course_id}}"
+          }
+        },
+        {
+          "name": "Update course",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Applied Physics II\",\n  \"code\": \"PHY-202\",\n  \"description\": \"Updated course overview\",\n  \"department\": \"Science\"\n}"
+            },
+            "url": "{{base_url}}/courses/{{course_id}}"
+          }
+        },
+        {
+          "name": "Enroll student",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/courses/{{course_id}}/students/{{student_id}}"
+          }
+        },
+        {
+          "name": "Remove student enrollment",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/courses/{{course_id}}/students/{{student_id}}"
+          }
+        },
+        {
+          "name": "List course enrollments",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/courses/{{course_id}}/students"
+          }
+        },
+        {
+          "name": "Delete course",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/courses/{{course_id}}"
+          }
+        }
+      ]
+    }
+  ]
+}

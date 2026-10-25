@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+PyJWT
+pwdlib[argon2]
+email-validator
+python-dotenv
+pytest
+httpx
